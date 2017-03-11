@@ -67,6 +67,9 @@
 ;; smart-newline-mode
 (smart-newline-mode t)
 
+;; undo-tree
+(undo-tree-mode t)
+
 (use-package helm
   :bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files))
