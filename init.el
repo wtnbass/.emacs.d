@@ -99,6 +99,18 @@
   :bind (("C-=" . er/expand-region)
          ("C-M-=" . er/contract-region)))
 
+(use-package smartrep
+  :config
+  ;; multiple-curcors key bind
+  (smartrep-define-key global-map "C-z"
+    '(("p" . 'mc/mark-previous-like-this)
+      ("n" . 'mc/mark-next-like-this)
+      ("u" . mc/unmark-next-like-this)
+      ("U" . mc/unmark-previous-like-this)
+      ("s" . mc/skip-to-next-like-this)
+      ("S" . mc/skip-to-previous-like-this)
+      ("*" . 'mc/mark-all-like-this))))
+
 (use-package emmet-mode
   :config
   (setq emmet-self-closing-tag-style " /"))

@@ -36,6 +36,7 @@
 (depends-on "s")
 (depends-on "smart-newline")
 (depends-on "smartparens")
+(depends-on "smartrep")
 (depends-on "smex")
 (depends-on "undo-tree")
 (depends-on "use-package")
