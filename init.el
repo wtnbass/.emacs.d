@@ -83,6 +83,10 @@
   (setq company-tooltip-align-annotations t))
 (global-company-mode t)
 
+(use-package expand-region
+  :bind (("C-=" . er/expand-region)
+         ("C-M-=" . er/contract-region)))
+
 (use-package emmet-mode
   :config
   (setq emmet-self-closing-tag-style " /"))
