@@ -12,6 +12,7 @@
 (unless (eq window-system nil)
   (set-frame-parameter nil 'fullscreen 'maximized)
   (load-theme 'monokai t))
+(setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
 
 ;; setting key bind
 (define-key global-map [?¥] [?\\])
