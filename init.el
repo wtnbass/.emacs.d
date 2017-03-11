@@ -78,6 +78,7 @@
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous))
   :config
+  (abbrev-mode t)
   (setq company-minimum-prefix-length 1)
   (setq company-idle-delay 0.2)
   (setq company-selection-wrap-around t)
