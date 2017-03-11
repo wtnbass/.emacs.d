@@ -21,6 +21,7 @@
 (depends-on "helm-swoop")
 (depends-on "htmlize")
 (depends-on "idle-highlight-mode")
+(depends-on "js2-mode")
 (depends-on "json-mode")
 (depends-on "magit")
 (depends-on "markdown-mode")

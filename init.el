@@ -94,3 +94,18 @@
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (add-hook 'web-mode-hook 'emmet-mode))
+
+(use-package js2-mode
+  :mode ("\\.jsx?\\'" . js2-jsx-mode)
+  :config
+  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
+  (setq js2-include-browser-externs nil)
+  (setq js2-mode-show-parse-errors nil)
+  (setq js2-mode-show-strict-warnings nil)
+  (setq js2-strict-trailing-comma-warning nil)
+  (setq js2-highlight-external-variables nil)
+  (setq js2-include-jslint-globals nil)
+  (setq js2-basic-offset 2)
+  (setq js-switch-indent-offset 2)
+  (setq emmet-expand-jsx-className? t)
+  (add-hook 'js2-jsx-mode-hook 'emmet-mode))
