@@ -1,5 +1,6 @@
 # .emacs.d
 
+![screenshot](https://raw.githubusercontent.com/wtnbass/.emacs.d/images/startup-screenshot.png)
 ## Instllation
 
 install cask
