@@ -28,3 +28,5 @@
 (setq transient-mark-mode t)
 (setq ring-bell-function 'ignore)
 
+(global-whitespace-mode t)
+(add-hook 'before-save-hook 'whitespace-cleanup)
