@@ -139,6 +139,7 @@
   (setq js2-basic-offset 2)
   (setq js-switch-indent-offset 2)
   (setq emmet-expand-jsx-className? t)
+  (add-hook 'js2-jsx-mode-hook 'tern-mode)
   (add-hook 'js2-jsx-mode-hook 'emmet-mode))
 
 (use-package go-mode
