@@ -2,9 +2,11 @@
 (load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+
 (require 'pallet)
 (pallet-mode t)
 
+;; UI
 (set-frame-font (font-spec :family "ricty diminished" :size 14))
 (load-theme 'monokai t)
 (nyan-mode t)
@@ -51,3 +53,7 @@
 ;; tab
 (setq-default indent-tabs-mode nil)
 (setq default-tab-width 2)
+
+(use-package helm
+  :bind (("M-x" . helm-M-x)
+         ("C-x C-f" . helm-find-files)))
