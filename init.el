@@ -82,3 +82,15 @@
   (setq company-dabbrev-downcase nil)
   (setq company-tooltip-align-annotations t))
 (global-company-mode t)
+
+(use-package emmet-mode
+  :config
+  (setq emmet-self-closing-tag-style " /"))
+
+(use-package web-mode
+  :mode "\\.html\\'"
+  :mode "\\.css\\'"
+  :config
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (add-hook 'web-mode-hook 'emmet-mode))
