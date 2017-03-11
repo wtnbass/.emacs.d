@@ -16,6 +16,7 @@
 (depends-on "flycheck")
 (depends-on "flycheck-cask")
 (depends-on "flymake-go")
+(depends-on "go-eldoc")
 (depends-on "go-mode")
 (depends-on "helm")
 (depends-on "helm-swoop")

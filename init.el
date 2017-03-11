@@ -22,6 +22,9 @@
 (prefer-coding-system 'utf-8)
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;; exec path
+(exec-path-from-shell-initialize)
+
 ;; hide tool bar
 (tool-bar-mode -1)
 
@@ -116,3 +119,16 @@
   (setq js-switch-indent-offset 2)
   (setq emmet-expand-jsx-className? t)
   (add-hook 'js2-jsx-mode-hook 'emmet-mode))
+
+(use-package go-mode
+  :config
+  (defun my/go-hook()
+    (add-hook 'before-save-hook' 'gofmt-before-save)
+    (local-set-key (kbd "M-.") 'godef-jump)
+    (set (make-local-variable 'company-backends) '(company-go))
+    (setq company-go-insert-arguments nil))
+
+  (add-hook 'go-mode-hook 'go-eldoc-setup)
+  (add-hook 'go-mode-hook 'company-mode)
+  (add-hook 'go-mode-hook 'flycheck-mode)
+  (add-hook 'go-mode-hook 'my/go-hook))
