@@ -73,6 +73,9 @@
   :config
   (helm-mode t))
 
+(use-package helm-swoop
+  :bind (("C-s" . helm-swoop)))
+
 (use-package magit
   :bind (("C-c g" . magit-status)))
 
