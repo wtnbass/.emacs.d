@@ -66,7 +66,9 @@
 
 (use-package helm
   :bind (("M-x" . helm-M-x)
-         ("C-x C-f" . helm-find-files)))
+         ("C-x C-f" . helm-find-files))
+  :config
+  (helm-mode t))
 
 (use-package magit
   :bind (("C-c g" . magit-status)))
