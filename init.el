@@ -12,6 +12,7 @@
 (nyan-mode t)
 
 ;; setting key bind
+(define-key global-map [?¥] [?\\])
 (global-unset-key (kbd "C-z"))
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (when (eq system-type 'darwin)
@@ -43,6 +44,9 @@
 ;; show paren pair
 (show-paren-mode t)
 
+;; auto close
+(electric-pair-mode t)
+
 ;; show line number
 (global-linum-mode t)
 
@@ -53,6 +57,12 @@
 ;; tab
 (setq-default indent-tabs-mode nil)
 (setq default-tab-width 2)
+
+;; anzu-mode
+(global-anzu-mode t)
+
+;; smart-newline-mode
+(smart-newline-mode t)
 
 (use-package helm
   :bind (("M-x" . helm-M-x)

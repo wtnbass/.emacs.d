@@ -32,6 +32,7 @@
 (depends-on "prodigy")
 (depends-on "projectile")
 (depends-on "s")
+(depends-on "smart-newline")
 (depends-on "smartparens")
 (depends-on "smex")
 (depends-on "use-package")
