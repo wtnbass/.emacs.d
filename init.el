@@ -8,8 +8,10 @@
 
 ;; UI
 (set-frame-font (font-spec :family "ricty diminished" :size 14))
-(load-theme 'monokai t)
 (nyan-mode t)
+(unless (eq window-system nil)
+  (set-frame-parameter nil 'fullscreen 'maximized)
+  (load-theme 'monokai t))
 
 ;; setting key bind
 (define-key global-map [?¥] [?\\])
