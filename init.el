@@ -10,7 +10,7 @@
 (set-frame-font (font-spec :family "ricty diminished" :size 14))
 (nyan-mode t)
 (unless (eq window-system nil)
-  (set-frame-parameter nil 'fullscreen 'maximized)
+;;  (set-frame-parameter nil 'fullscreen 'maximized)
   (load-theme 'monokai t))
 (setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
 
@@ -25,9 +25,10 @@
 (prefer-coding-system 'utf-8)
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(setq inhibit-startup-message t)
+
 ;; exec path
 (exec-path-from-shell-initialize)
-
 ;; hide tool bar
 (tool-bar-mode -1)
 
@@ -53,12 +54,13 @@
 ;; auto close
 (electric-pair-mode t)
 
-;; show line number
-(global-linum-mode t)
+;; show line and column
+(column-number-mode t)
 
 ;; show whitespaces
 (global-whitespace-mode t)
 (add-hook 'before-save-hook 'whitespace-cleanup)
+(setq whitespace-line-column 300)
 
 ;; tab
 (setq-default indent-tabs-mode nil)
@@ -71,7 +73,7 @@
 (smart-newline-mode t)
 
 ;; undo-tree
-(undo-tree-mode t)
+(global-undo-tree-mode t)
 
 (use-package helm
   :bind (("M-x" . helm-M-x)
@@ -114,6 +116,12 @@
       ("S" . mc/skip-to-previous-like-this)
       ("*" . 'mc/mark-all-like-this))))
 
+(use-package json-mode
+  :config
+  (defun my/json-indent()
+    (setq js-indent-level 2))
+  (add-hook 'json-mode-hook 'my/json-indent))
+
 (use-package emmet-mode
   :config
   (setq emmet-self-closing-tag-style " /"))
@@ -154,3 +162,15 @@
   (add-hook 'go-mode-hook 'company-mode)
   (add-hook 'go-mode-hook 'flycheck-mode)
   (add-hook 'go-mode-hook 'my/go-hook))
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+(use-package rust-mode
+  :mode "\\.rs\\'"
+  :config
+  (setq rust-format-on-save t)
+  (add-hook 'rust-mode-hook 'racer-mode)
+  (add-hook 'racer-mode-hook 'eldoc-mode)
+  (add-hook 'rust-mode-hook 'my/rust-setting)
+  (defun my/rust-setting ()
+    (flycheck-rust-setup)))
