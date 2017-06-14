@@ -1,4 +1,5 @@
 .cask
 auto-save-list
+eshell/
+.mc-lists.el
 .DS_Store
-
