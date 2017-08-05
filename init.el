@@ -128,6 +128,7 @@
 
 (use-package web-mode
   :mode "\\.html\\'"
+  :mode "\\.tera\\'"
   :mode "\\.css\\'"
   :config
   (setq web-mode-markup-indent-offset 2)
