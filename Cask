@@ -9,6 +9,7 @@
 (depends-on "company-tern")
 (depends-on "dash")
 (depends-on "drag-stuff")
+(depends-on "elixir-mode")
 (depends-on "emmet-mode")
 (depends-on "exec-path-from-shell")
 (depends-on "expand-region")

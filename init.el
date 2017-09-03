@@ -7,11 +7,8 @@
 (pallet-mode t)
 
 ;; UI
+(load-theme 'monokai t)
 (set-frame-font (font-spec :family "ricty diminished" :size 14))
-(nyan-mode t)
-(unless (eq window-system nil)
-;;  (set-frame-parameter nil 'fullscreen 'maximized)
-  (load-theme 'monokai t))
 (setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
 
 ;; setting key bind
