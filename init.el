@@ -28,6 +28,7 @@
 (exec-path-from-shell-initialize)
 ;; hide tool bar
 (tool-bar-mode -1)
+(menu-bar-mode -1)
 
 ;; hide scroll bar
 (set-scroll-bar-mode nil)
@@ -169,6 +170,5 @@
   (setq rust-format-on-save t)
   (add-hook 'rust-mode-hook 'racer-mode)
   (add-hook 'racer-mode-hook 'eldoc-mode)
-  (add-hook 'rust-mode-hook 'my/rust-setting)
-  (defun my/rust-setting ()
-    (flycheck-rust-setup)))
+  (add-hook 'rust-mode-hook 'flycheck-mode)
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
