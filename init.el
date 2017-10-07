@@ -8,8 +8,14 @@
 
 ;; UI
 (load-theme 'monokai t)
-(set-frame-font (font-spec :family "ricty diminished" :size 14))
-(setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
+(set-frame-font (font-spec :family "Monaco" :size 12))
+(defun set-frame-background-color (frame)
+  (select-frame frame)
+  ;; terminal
+  (unless (display-graphic-p)
+    (set-background-color "black")))
+(add-hook 'after-make-frame-functions 'set-frame-background-color)
+(set-frame-background-color (selected-frame))
 
 ;; setting key bind
 (define-key global-map [?¥] [?\\])
@@ -99,8 +105,8 @@
 (global-company-mode t)
 
 (use-package expand-region
-  :bind (("C-=" . er/expand-region)
-         ("C-M-=" . er/contract-region)))
+  :bind (("M-@" . er/expand-region)
+         ("C-M-@" . er/contract-region)))
 
 (use-package smartrep
   :config
