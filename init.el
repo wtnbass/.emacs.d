@@ -32,6 +32,7 @@
 
 ;; exec path
 (exec-path-from-shell-initialize)
+
 ;; hide tool bar
 (tool-bar-mode -1)
 (menu-bar-mode -1)
@@ -68,28 +69,16 @@
 
 ;; tab
 (setq-default indent-tabs-mode nil)
-(setq default-tab-width 2)
-
-;; anzu-mode
-(global-anzu-mode t)
+(setq default-tab-width 4)
 
 ;; smart-newline-mode
 (smart-newline-mode t)
-
-;; undo-tree
-(global-undo-tree-mode t)
 
 (use-package helm
   :bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files))
   :config
   (helm-mode t))
-
-(use-package helm-swoop
-  :bind (("C-s" . helm-swoop)))
-
-(use-package magit
-  :bind (("C-c g" . magit-status)))
 
 (use-package company
   :bind (:map company-active-map
@@ -121,39 +110,44 @@
       ("*" . 'mc/mark-all-like-this))))
 
 (use-package json-mode
-  :config
-  (defun my/json-indent()
-    (setq js-indent-level 2))
-  (add-hook 'json-mode-hook 'my/json-indent))
+  :mode "\\.json\\'"
+  :mode "\\.babelrc")
 
-(use-package emmet-mode
+(use-package tide
+  :init
+  (add-hook 'before-save-hook 'tide-format-before-save)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
   :config
-  (setq emmet-self-closing-tag-style " /"))
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (company-mode +1)
+    (local-set-key [f1] 'tide-documentation-at-point))
+
+  (setq company-tooltip-align-annotations t))
 
 (use-package web-mode
-  :mode "\\.html\\'"
+  :mode "\\.html"
   :mode "\\.tera\\'"
   :mode "\\.css\\'"
+  :mode "\\.jsx?\\'"
+  :mode "\\.tsx\\'"
   :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (add-hook 'web-mode-hook 'emmet-mode))
-
-(use-package js2-mode
-  :mode ("\\.jsx?\\'" . js2-jsx-mode)
-  :config
-  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
-  (setq js2-include-browser-externs nil)
-  (setq js2-mode-show-parse-errors nil)
-  (setq js2-mode-show-strict-warnings nil)
-  (setq js2-strict-trailing-comma-warning nil)
-  (setq js2-highlight-external-variables nil)
-  (setq js2-include-jslint-globals nil)
-  (setq js2-basic-offset 2)
-  (setq js-switch-indent-offset 2)
-  (setq emmet-expand-jsx-className? t)
-  (add-hook 'js2-jsx-mode-hook 'tern-mode)
-  (add-hook 'js2-jsx-mode-hook 'emmet-mode))
+  (setq web-mode-markup-indent-offset 4)
+  (setq web-mode-css-indent-offset 4)
+  (setq emmet-self-closing-tag-style " /")
+  (add-hook 'web-mode-hook 'emmet-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook (lambda ()
+                             (if (equal web-mode-content-type "javascript")
+                                 (web-mode-set-content-type "jsx"))))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode)))))
 
 (use-package go-mode
   :config
@@ -162,7 +156,6 @@
     (local-set-key (kbd "M-.") 'godef-jump)
     (set (make-local-variable 'company-backends) '(company-go))
     (setq company-go-insert-arguments nil))
-
   (add-hook 'go-mode-hook 'go-eldoc-setup)
   (add-hook 'go-mode-hook 'company-mode)
   (add-hook 'go-mode-hook 'flycheck-mode)
