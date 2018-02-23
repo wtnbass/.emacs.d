@@ -1,4 +1,4 @@
-;; (package-initialize)
+; (package-initialize)
 (load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
@@ -33,11 +33,8 @@
 ;; exec path
 (exec-path-from-shell-initialize)
 
-;; hide tool bar
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-
-;; hide scroll bar
 (set-scroll-bar-mode nil)
 
 ;; set mouse scroll step
@@ -53,13 +50,9 @@
 (setq transient-mark-mode t)
 (setq ring-bell-function 'ignore)
 
-;; show paren pair
 (show-paren-mode t)
-
-;; auto close
 (electric-pair-mode t)
 
-;; show line and column
 (column-number-mode t)
 
 ;; show whitespaces
@@ -70,9 +63,6 @@
 ;; tab
 (setq-default indent-tabs-mode nil)
 (setq default-tab-width 4)
-
-;; smart-newline-mode
-(smart-newline-mode t)
 
 (use-package helm
   :bind (("M-x" . helm-M-x)
@@ -111,12 +101,18 @@
 
 (use-package json-mode
   :mode "\\.json\\'"
-  :mode "\\.babelrc")
+  :mode "\\.babelrc"
+  :config
+  (add-hook 'json-mode-hook
+            (lambda ()
+              (make-local-variable 'js-indent-level)
+              (setq js-indent-level 2))))
 
 (use-package tide
   :init
   (add-hook 'before-save-hook 'tide-format-before-save)
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  (add-hook 'typescript-mode-hook 'prettier-js-mode)
   :config
   (defun setup-tide-mode ()
     (interactive)
@@ -126,28 +122,42 @@
     (eldoc-mode +1)
     (company-mode +1)
     (local-set-key [f1] 'tide-documentation-at-point))
-
   (setq company-tooltip-align-annotations t))
 
 (use-package web-mode
-  :mode "\\.html"
+  :mode "\\.html\\'"
   :mode "\\.tera\\'"
   :mode "\\.css\\'"
-  :mode "\\.jsx?\\'"
   :mode "\\.tsx\\'"
   :config
-  (setq web-mode-markup-indent-offset 4)
-  (setq web-mode-css-indent-offset 4)
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
   (setq emmet-self-closing-tag-style " /")
   (add-hook 'web-mode-hook 'emmet-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook (lambda ()
-                             (if (equal web-mode-content-type "javascript")
-                                 (web-mode-set-content-type "jsx"))))
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode)))))
+
+
+(use-package js2-mode
+  :mode ("\\.jsx?\\'" . js2-jsx-mode)
+  :config
+  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
+  (setq js2-include-browser-externs nil)
+  (setq js2-mode-show-parse-errors nil)
+  (setq js2-mode-show-strict-warnings nil)
+  (setq js2-strict-trailing-comma-warning nil)
+  (setq js2-highlight-external-variables nil)
+  (setq js2-include-jslint-globals nil)
+  (setq js2-basic-offset 2)
+  (setq js-switch-indent-offset 2)
+  (setq emmet-expand-jsx-className? t)
+  (setq emmet-self-closing-tag-style " /")
+  (add-hook 'js2-jsx-mode-hook 'tern-mode)
+  (add-hook 'js2-jsx-mode-hook 'emmet-mode)
+  (add-hook 'js2-jsx-mode-hook 'prettier-js-mode)
+)
 
 (use-package go-mode
   :config
@@ -171,3 +181,16 @@
   (add-hook 'racer-mode-hook 'eldoc-mode)
   (add-hook 'rust-mode-hook 'flycheck-mode)
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(use-package python-mode
+  :mode "\\.py\\'"
+  :config
+  (setq python-indent 4))
+
+(use-package elm-mode
+  :mode "\\.elm\\'"
+  :config
+  (setq elm-format-on-save t)
+  (setq elm-sort-imports-on-save t)
+  (add-hook 'elm-mode-hook 'company-mode)
+  (add-to-list 'company-backends 'company-elm))
