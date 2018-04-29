@@ -1,4 +1,4 @@
-; (package-initialize)
+;; (package-initialize)
 (load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
@@ -16,6 +16,7 @@
     (set-background-color "black")))
 (add-hook 'after-make-frame-functions 'set-frame-background-color)
 (set-frame-background-color (selected-frame))
+(setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
 
 ;; setting key bind
 (define-key global-map [?¥] [?\\])
@@ -64,6 +65,10 @@
 (setq-default indent-tabs-mode nil)
 (setq default-tab-width 4)
 
+;; down/up case region
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
 (use-package helm
   :bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files))
@@ -87,17 +92,21 @@
   :bind (("M-@" . er/expand-region)
          ("C-M-@" . er/contract-region)))
 
-(use-package smartrep
+(use-package multiple-cursors
   :config
-  ;; multiple-curcors key bind
-  (smartrep-define-key global-map "C-z"
-    '(("p" . 'mc/mark-previous-like-this)
-      ("n" . 'mc/mark-next-like-this)
-      ("u" . mc/unmark-next-like-this)
-      ("U" . mc/unmark-previous-like-this)
-      ("s" . mc/skip-to-next-like-this)
-      ("S" . mc/skip-to-previous-like-this)
-      ("*" . 'mc/mark-all-like-this))))
+  (use-package smartrep
+    :config
+    (smartrep-define-key global-map "C-z"
+      '(("p" . 'mc/mark-previous-like-this)
+        ("n" . 'mc/mark-next-like-this)
+        ("u" . mc/unmark-next-like-this)
+        ("U" . mc/unmark-previous-like-this)
+        ("s" . mc/skip-to-next-like-this)
+        ("S" . mc/skip-to-previous-like-this)
+        ("*" . 'mc/mark-all-like-this)))))
+
+(use-package magit
+  :bind (("C-c C-g" . magit-status)))
 
 (use-package json-mode
   :mode "\\.json\\'"
@@ -108,56 +117,56 @@
               (make-local-variable 'js-indent-level)
               (setq js-indent-level 2))))
 
-(use-package tide
-  :init
-  (add-hook 'before-save-hook 'tide-format-before-save)
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
-  (add-hook 'typescript-mode-hook 'prettier-js-mode)
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (company-mode +1)
+  (local-set-key [f1] 'tide-documentation-at-point))
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :mode "\\.tsx\\'"
   :config
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (company-mode +1)
-    (local-set-key [f1] 'tide-documentation-at-point))
+  (setq typescript-indent-level 2)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  (add-hook 'typescript-mode-hook 'emmet-mode)
+  (add-hook 'typescript-mode-hook 'prettier-js-mode)
+  (setq emmet-self-closing-tag-style " /")
   (setq company-tooltip-align-annotations t))
+
+(defun enable-miner-mode (my-pair)
+  "Enabel minor mode if filename match the regexp. MY-PAIR is a cons cell"
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+          (funcall (cdr my-pair)))))
+
+(defun setup-prettier-js-mode-for-web ()
+  (enable-miner-mode '("\\.jsx?\\'" . prettier-js-mode))
+  (enable-miner-mode '("\\.css\\'" . prettier-js-mode)))
 
 (use-package web-mode
   :mode "\\.html\\'"
   :mode "\\.tera\\'"
   :mode "\\.css\\'"
-  :mode "\\.tsx\\'"
+  :mode "\\.jsx?\\'"
   :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (setq emmet-self-closing-tag-style " /")
-  (add-hook 'web-mode-hook 'emmet-mode)
-  (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode)))))
-
-
-(use-package js2-mode
-  :mode ("\\.jsx?\\'" . js2-jsx-mode)
-  :config
-  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
-  (setq js2-include-browser-externs nil)
-  (setq js2-mode-show-parse-errors nil)
-  (setq js2-mode-show-strict-warnings nil)
-  (setq js2-strict-trailing-comma-warning nil)
-  (setq js2-highlight-external-variables nil)
-  (setq js2-include-jslint-globals nil)
-  (setq js2-basic-offset 2)
-  (setq js-switch-indent-offset 2)
   (setq emmet-expand-jsx-className? t)
   (setq emmet-self-closing-tag-style " /")
-  (add-hook 'js2-jsx-mode-hook 'tern-mode)
-  (add-hook 'js2-jsx-mode-hook 'emmet-mode)
-  (add-hook 'js2-jsx-mode-hook 'prettier-js-mode)
-)
+  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
+  (add-hook 'web-mode-hook 'tern-mode)
+  (add-hook 'web-mode-hook 'emmet-mode)
+  (add-hook 'web-mode-hook #'setup-prettier-js-mode-for-web))
+
+(use-package scss-mode
+  :mode "\\.scss\\'"
+  :config
+  (add-hook 'scss-mode-hook 'prettier-js-mode))
 
 (use-package go-mode
   :config
@@ -170,8 +179,6 @@
   (add-hook 'go-mode-hook 'company-mode)
   (add-hook 'go-mode-hook 'flycheck-mode)
   (add-hook 'go-mode-hook 'my/go-hook))
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
 
 (use-package rust-mode
   :mode "\\.rs\\'"
