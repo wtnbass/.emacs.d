@@ -5,6 +5,7 @@
 (depends-on "cask")
 (depends-on "company")
 (depends-on "company-go")
+(depends-on "company-jedi")
 (depends-on "elm-mode")
 (depends-on "emmet-mode")
 (depends-on "exec-path-from-shell")

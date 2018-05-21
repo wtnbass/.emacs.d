@@ -6,18 +6,6 @@
 (require 'pallet)
 (pallet-mode t)
 
-;; UI
-(load-theme 'monokai t)
-(set-frame-font (font-spec :family "Monaco" :size 12))
-(defun set-frame-background-color (frame)
-  (select-frame frame)
-  ;; terminal
-  (unless (display-graphic-p)
-    (set-background-color "black")))
-(add-hook 'after-make-frame-functions 'set-frame-background-color)
-(set-frame-background-color (selected-frame))
-(setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
-
 ;; setting key bind
 (define-key global-map [?¥] [?\\])
 (global-unset-key (kbd "C-z"))
@@ -68,6 +56,26 @@
 ;; down/up case region
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+
+;; UI
+(load-theme 'monokai t)
+(set-frame-font (font-spec :family "Monaco" :size 12))
+(defun set-frame-background-color (frame)
+  (select-frame frame)
+  ;; terminal
+  (unless (display-graphic-p)
+    (set-background-color "black")))
+(add-hook 'after-make-frame-functions 'set-frame-background-color)
+(set-frame-background-color (selected-frame))
+
+;; window
+(unless (eq window-system nil)
+  (setq inhibit-startup-message nil)
+  (set-frame-parameter (selected-frame) 'alpha 85)
+  (set-frame-parameter nil 'fullscreen 'maximized))
+
+(setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
+
 
 (use-package helm
   :bind (("M-x" . helm-M-x)
@@ -189,10 +197,25 @@
   (add-hook 'rust-mode-hook 'flycheck-mode)
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+
 (use-package python-mode
   :mode "\\.py\\'"
   :config
-  (setq python-indent 4))
+  (setq py-python-command "python3")
+  (setq python-indent 4)
+  (require 'python)
+
+  (setq python-shell-interpreter "ipython")
+  (setq python-shell-interpreter-args "")
+  (setq python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
+  (setq python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
+  (setq python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
+  (setq python-shell-completion-module-string-code  "';'.join(module_completion('''%s'''))\n")
+  (setq python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (add-hook 'python-mode-hook 'my/python-mode-hook))
 
 (use-package elm-mode
   :mode "\\.elm\\'"
