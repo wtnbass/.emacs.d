@@ -7,10 +7,10 @@
 (pallet-mode t)
 
 ;; setting key bind
-(define-key global-map [?¥] [?\\])
 (global-unset-key (kbd "C-z"))
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (when (eq system-type 'darwin)
+  (define-key global-map [?¥] [?\\])
   (setq ns-command-modifier (quote meta)))
 
 (require 'cl)
@@ -39,11 +39,6 @@
 (setq transient-mark-mode t)
 (setq ring-bell-function 'ignore)
 
-(show-paren-mode t)
-(electric-pair-mode t)
-
-(column-number-mode t)
-
 ;; show whitespaces
 (global-whitespace-mode t)
 (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -58,7 +53,11 @@
 (put 'upcase-region 'disabled nil)
 
 ;; UI
-(load-theme 'monokai t)
+(load-theme 'material t)
+(show-paren-mode t)
+(electric-pair-mode t)
+(column-number-mode t)
+(global-git-gutter+-mode)
 (set-frame-font (font-spec :family "Monaco" :size 12))
 (defun set-frame-background-color (frame)
   (select-frame frame)
@@ -76,12 +75,14 @@
 
 (setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
 
-
 (use-package helm
   :bind (("M-x" . helm-M-x)
-         ("C-x C-f" . helm-find-files))
+         ("C-x C-f" . helm-find-files)))
+(helm-mode t)
+
+(use-package undo-tree
   :config
-  (helm-mode t))
+  (global-undo-tree-mode t))
 
 (use-package company
   :bind (:map company-active-map
@@ -115,6 +116,9 @@
 
 (use-package magit
   :bind (("C-c C-g" . magit-status)))
+
+(use-package ox-hugo
+  :after ox)
 
 (use-package json-mode
   :mode "\\.json\\'"
@@ -205,15 +209,13 @@
   :config
   (setq py-python-command "python3")
   (setq python-indent 4)
-  (require 'python)
-
   (setq python-shell-interpreter "ipython")
   (setq python-shell-interpreter-args "")
   (setq python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
   (setq python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
   (setq python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
   (setq python-shell-completion-module-string-code  "';'.join(module_completion('''%s'''))\n")
-  (setq python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+  (setq python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
   (add-hook 'python-mode-hook 'jedi:setup)
   (add-hook 'python-mode-hook 'my/python-mode-hook))
 
@@ -224,3 +226,7 @@
   (setq elm-sort-imports-on-save t)
   (add-hook 'elm-mode-hook 'company-mode)
   (add-to-list 'company-backends 'company-elm))
+
+(use-package haskell-mode
+  :config
+  (add-hook 'haskell-mode 'intero-mode))
