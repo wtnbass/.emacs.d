@@ -6,3 +6,4 @@ url/
 .mc-lists.el
 .DS_Store
 .python-environments/
+smex-items
