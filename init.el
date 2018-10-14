@@ -15,13 +15,11 @@
 ;; Key Binding
 ;; =====
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
-(define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 
 ;; MacOS
 (setq mac-command-modifier 'super)
 (setq mac-right-command-modifier ' super)
 (setq mac-option-modifier 'meta)
-(setq mac-right-option-modifier 'nil)
 
 ;; Fix for JIS keyboard
 (when (eq system-type 'darwin)
@@ -73,8 +71,6 @@
 ;; TAB
 (setq-default indent-tabs-mode nil)
 (setq default-tab-width 4)
-(setq js-indent-level 2)
-(setq css-indent-level 2)
 
 ;; down/up case region
 (put 'downcase-region 'disabled nil)
@@ -257,23 +253,25 @@
 
 (use-package toml-mode)
 
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (company-mode +1)
-  (local-set-key [f1] 'tide-documentation-at-point))
-
 (use-package typescript-mode
   :mode "\\.ts\\'"
   :mode "\\.tsx\\'"
   :config
   (setq typescript-indent-level 2)
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (setq emmet-self-closing-tag-style " /")
   (setq company-tooltip-align-annotations t))
+
+(use-package tide
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (company-mode +1)
+    (local-set-key [f1] 'tide-documentation-at-point))
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
 (use-package web-mode
   :mode "\\.html\\'"
@@ -285,9 +283,13 @@
   :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-attr-indent-offset 2)
+  (setq web-mode-attr-value-indent-offset 2)
   (setq emmet-self-closing-tag-style " /")
   (setq emmet-expand-jsx-className? t)
   (setq emmet-self-closing-tag-style " /")
+  (use-package company-tern)
   (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
   (add-hook 'web-mode-hook 'tern-mode))
 
@@ -305,7 +307,14 @@
 ;; Formatter for Web
 (use-package prettier-js
   :config
-  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (defun enable-minor-mode (my-pair)
+    "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+    (if (buffer-file-name)
+        (if (string-match (car my-pair) buffer-file-name)
+            (funcall (cdr my-pair)))))
+  (add-hook 'web-mode-hook #'(lambda ()
+                               (enable-minor-mode
+                                '("\\.jsx?\\'" . prettier-js-mode))))
   (add-hook 'typescript-mode-hook 'prettier-js-mode))
 
 ;; Go
@@ -321,14 +330,21 @@
   (add-hook 'go-mode-hook 'flycheck-mode)
   (add-hook 'go-mode-hook 'my/go-hook))
 
+;; Rust
 (use-package rust-mode
   :mode "\\.rs\\'"
   :config
+  (use-package flycheck-rust)
   (setq rust-format-on-save t)
-  (add-hook 'rust-mode-hook 'racer-mode)
+  (add-hook 'rust-mode-hook 'lsp-rust-enable)
   (add-hook 'racer-mode-hook 'eldoc-mode)
   (add-hook 'rust-mode-hook 'flycheck-mode)
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(use-package lsp-mode
+  :config
+  (use-package lsp-rust)
+  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls")))
 
 (defun my/python-mode-hook ()
   (add-to-list 'company-backends 'company-jedi))
