@@ -15,8 +15,9 @@
 ;; Key Binding
 ;; =====
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+(define-key global-map (kbd "C-x ?") 'help-command)
 
-;; MacOS
+;; macOS
 (setq mac-command-modifier 'super)
 (setq mac-right-command-modifier ' super)
 (setq mac-option-modifier 'meta)
@@ -25,7 +26,7 @@
 (when (eq system-type 'darwin)
   (define-key global-map [?¥] [?\\]))
 
-;; MacOS like
+;; macOS like
 (global-set-key (kbd "s-s") 'save-buffer)
 (global-set-key (kbd "s-S") 'write-file)
 (global-set-key (kbd "s-q") 'save-buffers-kill-emacs)
@@ -124,6 +125,11 @@
   (rich-minority-mode 1)
   (setf rm-blacklist ""))
 
+(use-package window-number
+  :bind(("C-x o" . 'window-number-switch))
+  :config
+  (window-number-mode t))
+
 ;; Completion
 ;; =====
 (use-package ido-vertical-mode)
@@ -194,6 +200,7 @@
   :config
   (custom-set-variables
    '(shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
+   '(shell-pop-term-shell "/bin/bash")
    '(shell-pop-universal-key "C-`"))) ;; Control + Shift + @
 
 
@@ -203,14 +210,13 @@
   :bind (("M-@" . er/expand-region)
          ("C-M-@" . er/contract-region)))
 
-(global-unset-key (kbd "s-p"))
-(global-unset-key (kbd "s-n"))
 (use-package multiple-cursors
-  :bind(("M-s-<up>" . 'mc/mark-previous-like-this)
-        ("M-s-<down>" . 'mc/mark-next-like-this)
-        ("s-P" . 'mc/mark-previous-like-this)
-        ("s-N" . 'mc/mark-next-like-this)
-        ("s-L" . 'mc/mark-all-like-this)))
+  :bind(("M-S-<up>" . 'mc/mark-previous-like-this)
+        ("M-S-<down>" . 'mc/mark-next-like-this)
+        ("M-P" . 'mc/mark-previous-like-this)
+        ("M-N" . 'mc/mark-next-like-this)
+        ("M-L" . 'mc/mark-all-like-this)
+        ("M-*" . 'mc/mark-all-like-this)))
 
 ;; Org-mode
 ;; =====
