@@ -1,8 +1,8 @@
 # .emacs.d
 
-![screenshot](https://raw.githubusercontent.com/wtnbass/.emacs.d/master/startup-screenshot.png)
+![screenshot](startup-screenshot.png)
 
-## Instllation
+## Installation
 
 ```[sh]
 git clone git@github.com:wtnbass/.emacs.d.git ~/.emacs.d
