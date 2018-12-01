@@ -94,7 +94,6 @@
 ;; UI
 (use-package material-theme)
 (load-theme 'material)
-;;(load-theme 'tsdh-light)
 
 (global-display-line-numbers-mode t)
 (column-number-mode t)
@@ -116,15 +115,6 @@
   (set-frame-parameter (selected-frame) 'alpha 95)
   (set-frame-parameter nil 'fullscreen 'maximized))
 
-(use-package all-the-icons)
-;; MUST DO M-x all-the-icons-install-fonts after
-
-;; Hide minor modes from modeline
-(use-package rich-minority
-  :config
-  (rich-minority-mode 1)
-  (setf rm-blacklist ""))
-
 (use-package window-number
   :bind(("C-x o" . 'window-number-switch))
   :config
@@ -134,8 +124,10 @@
 ;; =====
 (use-package ido-vertical-mode)
 (ido-mode t)
+(ido-everywhere t)
 (ido-vertical-mode t)
 (setq ido-enable-flex-matching t)
+(setq ido-auto-merge-work-directories-length -1)
 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 (use-package smex
   :bind (("M-x" . smex)
@@ -153,7 +145,6 @@
   (setq company-selection-wrap-around t)
   (setq company-dabbrev-downcase nil)
   (setq company-tooltip-align-annotations t))
-(global-company-mode t)
 
 (use-package swiper
   :config
@@ -194,6 +185,7 @@
   :config
   (global-git-gutter-mode t))
 
+
 ;; Terminal
 ;; =====
 (use-package shell-pop
@@ -216,6 +208,8 @@
         ("M-P" . 'mc/mark-previous-like-this)
         ("M-N" . 'mc/mark-next-like-this)
         ("M-L" . 'mc/mark-all-like-this)
+        ("C-M-P" . 'mc/skip-to-previous-like-this)
+        ("C-M-N" . 'mc/skip-to-next-like-this)
         ("M-*" . 'mc/mark-all-like-this)))
 
 ;; Org-mode
@@ -259,117 +253,140 @@
 
 (use-package toml-mode)
 
-(use-package typescript-mode
-  :mode "\\.ts\\'"
-  :mode "\\.tsx\\'"
-  :config
-  (setq typescript-indent-level 2)
-  (setq emmet-self-closing-tag-style " /")
-  (setq company-tooltip-align-annotations t))
+;; Language Server Protocol
+(use-package lsp-mode)
 
-(use-package tide
+(use-package company-lsp
   :config
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (company-mode +1)
-    (local-set-key [f1] 'tide-documentation-at-point))
-  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+  (add-to-list 'company-backends 'company-lsp))
+
+(use-package lsp-ui
+  :requires lsp-mode
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+;; C/C++
+(use-package lsp-clangd
+  :init
+  (when (equal system-type 'darwin)
+    (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
+  :config
+  (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
+  (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
+  (add-hook 'objc-mode-hook #'lsp-clangd-objc-enable))
 
 (use-package web-mode
   :mode "\\.html\\'"
   :mode ".erb\\'"
   :mode "\\.[agj]sp\\'"
   :mode "\\.tera\\'"
-  :mode "\\.css\\'"
-  :mode "\\.jsx?\\'"
   :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-attr-indent-offset 2)
-  (setq web-mode-attr-value-indent-offset 2)
-  (setq emmet-self-closing-tag-style " /")
-  (setq emmet-expand-jsx-className? t)
-  (setq emmet-self-closing-tag-style " /")
-  (use-package company-tern)
-  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
-  (add-hook 'web-mode-hook 'tern-mode))
+  (setq web-mode-attr-value-indent-offset 2))
+
+(use-package lsp-html
+  :config
+  (add-hook 'html-mode-hook #'lsp-html-enable)
+  (add-hook 'web-mode-hook #'lsp-html-enable))
 
 (use-package scss-mode
   :mode "\\.scss\\'"
   :config
   (add-hook 'scss-mode-hook 'prettier-js-mode))
 
+(use-package lsp-css
+  :config
+  (add-hook 'css-mode-hook #'my-css-mode-setup)
+  (add-hook 'sass-mode-hook #'lsp-scss-enable)
+  (add-hook 'scss-mode-hook #'lsp-scss-enable))
+
+;; Javascript
+(use-package lsp-javascript-typescript
+  :config
+  (add-hook 'js-mode-hook #'lsp-javascript-typescript-enable))
+
+;; Typescript
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :mode "\\.tsx\\'"
+  :config
+  (setq typescript-indent-level 2)
+  (setq emmet-self-closing-tag-style " /")
+  (setq company-tooltip-align-annotations t)
+  ;;(setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (add-hook 'typescript-mode 'flycheck-mode))
+
+(use-package lsp-typescript
+  :config
+  (add-hook 'typescript-mode-hook #'lsp-typescript-enable))
+
+;; Vue.js
+(use-package vue-mode)
+
+(use-package lsp-vue
+  :config
+  (add-hook 'vue-mode-hook #'lsp-vue-mmm-enable))
+
 ;; Emmet
 (use-package emmet-mode
   :config
+  (setq emmet-self-closing-tag-style " /")
+  (setq emmet-expand-jsx-className? t)
   (add-hook 'web-mode-hook 'emmet-mode)
-  (add-hook 'typescript-mode-hook 'emmet-mode))
+  (add-hook 'typescript-mode-hook 'emmet-mode)
+  (add-hook 'vue-mode-hook 'emmet-mode))
 
-;; Formatter for Web
+;; Prettier
 (use-package prettier-js
   :config
-  (defun enable-minor-mode (my-pair)
-    "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-    (if (buffer-file-name)
-        (if (string-match (car my-pair) buffer-file-name)
-            (funcall (cdr my-pair)))))
-  (add-hook 'web-mode-hook #'(lambda ()
-                               (enable-minor-mode
-                                '("\\.jsx?\\'" . prettier-js-mode))))
-  (add-hook 'typescript-mode-hook 'prettier-js-mode))
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'typescript-mode-hook 'prettier-js-mode)
+  (add-hook 'vue-mode-hook 'prettier-js-mode))
 
 ;; Go
 (use-package go-mode
   :config
-  (defun my/go-hook()
-    (add-hook 'before-save-hook' 'gofmt-before-save)
-    (local-set-key (kbd "M-.") 'godef-jump)
-    (set (make-local-variable 'company-backends) '(company-go))
-    (setq company-go-insert-arguments nil))
-  (add-hook 'go-mode-hook 'go-eldoc-setup)
-  (add-hook 'go-mode-hook 'company-mode)
-  (add-hook 'go-mode-hook 'flycheck-mode)
-  (add-hook 'go-mode-hook 'my/go-hook))
+  (add-hook 'go-mode-hook
+            '(lambda()
+               (add-hook 'before-save-hook' 'gofmt-before-save))))
+
+(use-package lsp-go
+  :config
+  (add-hook 'go-mode-hook #'lsp-go-enable))
 
 ;; Rust
 (use-package rust-mode
   :mode "\\.rs\\'"
   :config
-  (use-package flycheck-rust)
-  (setq rust-format-on-save t)
-  (add-hook 'rust-mode-hook 'lsp-rust-enable)
-  (add-hook 'racer-mode-hook 'eldoc-mode)
-  (add-hook 'rust-mode-hook 'flycheck-mode)
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+  (setq rust-format-on-save t))
 
-(use-package lsp-mode
+(use-package lsp-rust
   :config
-  (use-package lsp-rust)
-  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls")))
+  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
+  (add-hook 'rust-mode-hook 'flycheck-mode)
+  (add-hook 'rust-mode-hook 'lsp-rust-enable))
 
-(defun my/python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi))
-
+;; Python
 (use-package python-mode
   :mode "\\.py\\'"
   :config
   (setq py-python-command "python3")
-  (setq python-indent 4)
-  (setq python-shell-interpreter "ipython")
-  (setq python-shell-interpreter-args "")
-  (setq python-shell-prompt-regexp "In \\[[0-9]+\\]: ")
-  (setq python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: ")
-  (setq python-shell-completion-setup-code "from IPython.core.completerlib import module_completion")
-  (setq python-shell-completion-module-string-code  "';'.join(module_completion('''%s'''))\n")
-  (setq python-shell-completion-string-code "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'python-mode-hook 'my/python-mode-hook))
+  (setq python-indent 4))
 
+(use-package company-jedi
+  :config
+  (add-hook 'python-mode-hook
+            '(lambda()
+               (add-to-list 'company-backends 'company-jedi))))
+
+(use-package lsp-python
+  :config
+  (add-hook 'python-mode-hook #'lsp-python-enable))
+
+;; Elm
 (use-package elm-mode
   :mode "\\.elm\\'"
   :config
@@ -378,7 +395,14 @@
   (add-hook 'elm-mode-hook 'company-mode)
   (add-to-list 'company-backends 'company-elm))
 
+;; Haskell
 (use-package haskell-mode
   :config
   (use-package intero)
   (add-hook 'haskell-mode 'intero-mode))
+
+;; Java
+(use-package lsp-java
+  :config
+  (add-hook 'java-mode-hook #'lsp-java-enable)
+  (add-hook 'java-mode-hook 'flycheck-mode))
