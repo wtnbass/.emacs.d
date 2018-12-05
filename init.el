@@ -145,6 +145,7 @@
   (setq company-selection-wrap-around t)
   (setq company-dabbrev-downcase nil)
   (setq company-tooltip-align-annotations t))
+(global-company-mode t)
 
 (use-package swiper
   :config
@@ -384,7 +385,8 @@
 
 (use-package lsp-python
   :config
-  (add-hook 'python-mode-hook #'lsp-python-enable))
+  (add-hook 'python-mode-hook #'lsp-python-enable)
+  (add-hook 'python-mode-hook 'flycheck-mode))
 
 ;; Elm
 (use-package elm-mode

@@ -30,4 +30,7 @@ npm i -g vue-language-server
 
 # lsp-go
 go get -u github.com/sourcegraph/go-langserver
+
+# lsp-python
+pip install 'python-language-server[all]'
 ```
