@@ -8,3 +8,4 @@ url/
 .python-environments/
 smex-items
 ido.last
+.lsp-session-*

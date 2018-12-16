@@ -99,7 +99,8 @@
 (column-number-mode t)
 
 ;; Font
-(set-frame-font (font-spec :family "Monaco" :size 12))
+;;(set-frame-font (font-spec :family "Monaco" :size 12))
+(set-frame-font (font-spec :family "Fira Code" :size 12))
 (setq-default line-spacing 2)
 
 (defun set-frame-background-color (frame)
@@ -255,26 +256,33 @@
 (use-package toml-mode)
 
 ;; Language Server Protocol
-(use-package lsp-mode)
-
-(use-package company-lsp
-  :config
-  (add-to-list 'company-backends 'company-lsp))
-
-(use-package lsp-ui
-  :requires lsp-mode
-  :config
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-
-;; C/C++
-(use-package lsp-clangd
+(use-package lsp-mode
   :init
+  (require 'lsp-clients)
   (when (equal system-type 'darwin)
     (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
   :config
-  (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
-  (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
-  (add-hook 'objc-mode-hook #'lsp-clangd-objc-enable))
+  ;; C/C++
+  (add-hook 'c-mode-hook 'lsp)
+  (add-hook 'c++-mode-hook 'lsp)
+  (add-hook 'objc-mode-hook 'lsp)
+  ;; html
+  (add-hook 'html-mode-hook 'lsp)
+  ;; CSS
+  (add-hook 'css-mode-hook 'lsp)
+  (add-hook 'sass-mode-hook 'lsp)
+  (add-hook 'scss-mode-hook 'lsp)
+  ;; Javascript/Typescript
+  (add-hook 'js-mode-hook 'lsp)
+  (add-hook 'typescript-mode-hook 'lsp)
+  (add-hook 'vue-mode-hook 'lsp)
+  ;; Python
+  (add-hook 'python-mode-hook #'lsp-python-enable)
+  ;; Rust
+  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
+  (add-hook 'rust-mode-hook 'lsp)
+  ;; Go
+  (add-hook 'go-mode-hook 'lsp))
 
 (use-package web-mode
   :mode "\\.html\\'"
@@ -288,27 +296,6 @@
   (setq web-mode-attr-indent-offset 2)
   (setq web-mode-attr-value-indent-offset 2))
 
-(use-package lsp-html
-  :config
-  (add-hook 'html-mode-hook #'lsp-html-enable)
-  (add-hook 'web-mode-hook #'lsp-html-enable))
-
-(use-package scss-mode
-  :mode "\\.scss\\'"
-  :config
-  (add-hook 'scss-mode-hook 'prettier-js-mode))
-
-(use-package lsp-css
-  :config
-  (add-hook 'css-mode-hook #'my-css-mode-setup)
-  (add-hook 'sass-mode-hook #'lsp-scss-enable)
-  (add-hook 'scss-mode-hook #'lsp-scss-enable))
-
-;; Javascript
-(use-package lsp-javascript-typescript
-  :config
-  (add-hook 'js-mode-hook #'lsp-javascript-typescript-enable))
-
 ;; Typescript
 (use-package typescript-mode
   :mode "\\.ts\\'"
@@ -317,19 +304,10 @@
   (setq typescript-indent-level 2)
   (setq emmet-self-closing-tag-style " /")
   (setq company-tooltip-align-annotations t)
-  ;;(setq flycheck-check-syntax-automatically '(save mode-enabled))
   (add-hook 'typescript-mode 'flycheck-mode))
-
-(use-package lsp-typescript
-  :config
-  (add-hook 'typescript-mode-hook #'lsp-typescript-enable))
 
 ;; Vue.js
 (use-package vue-mode)
-
-(use-package lsp-vue
-  :config
-  (add-hook 'vue-mode-hook #'lsp-vue-mmm-enable))
 
 ;; Emmet
 (use-package emmet-mode
@@ -354,38 +332,19 @@
             '(lambda()
                (add-hook 'before-save-hook' 'gofmt-before-save))))
 
-(use-package lsp-go
-  :config
-  (add-hook 'go-mode-hook #'lsp-go-enable))
-
 ;; Rust
 (use-package rust-mode
   :mode "\\.rs\\'"
   :config
-  (setq rust-format-on-save t))
-
-(use-package lsp-rust
-  :config
-  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
-  (add-hook 'rust-mode-hook 'flycheck-mode)
-  (add-hook 'rust-mode-hook 'lsp-rust-enable))
+  (setq rust-format-on-save t)
+  (add-hook 'rust-mode-hook 'flycheck-mode))
 
 ;; Python
 (use-package python-mode
   :mode "\\.py\\'"
   :config
   (setq py-python-command "python3")
-  (setq python-indent 4))
-
-(use-package company-jedi
-  :config
-  (add-hook 'python-mode-hook
-            '(lambda()
-               (add-to-list 'company-backends 'company-jedi))))
-
-(use-package lsp-python
-  :config
-  (add-hook 'python-mode-hook #'lsp-python-enable)
+  (setq python-indent 4)
   (add-hook 'python-mode-hook 'flycheck-mode))
 
 ;; Elm
@@ -402,9 +361,3 @@
   :config
   (use-package intero)
   (add-hook 'haskell-mode 'intero-mode))
-
-;; Java
-(use-package lsp-java
-  :config
-  (add-hook 'java-mode-hook #'lsp-java-enable)
-  (add-hook 'java-mode-hook 'flycheck-mode))
