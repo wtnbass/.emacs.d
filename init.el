@@ -1,9 +1,10 @@
 ;; Package
-;; =====
+;; ------------
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") )
-(package-initialize)
+(when (< emacs-major-version 27)
+  (package-initialize))
 
 (load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
@@ -12,8 +13,9 @@
   (package-install 'use-package))
 
 (setq use-package-always-ensure t)
+
 ;; Key Binding
-;; =====
+;; ------------
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (define-key global-map (kbd "C-x ?") 'help-command)
 
@@ -36,7 +38,7 @@
 
 
 ;; Basic setting
-;; =====
+;; ------------
 (require 'cl)
 (prefer-coding-system 'utf-8)
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -101,6 +103,38 @@
 ;; Font
 ;;(set-frame-font (font-spec :family "Monaco" :size 12))
 (set-frame-font (font-spec :family "Fira Code" :size 12))
+
+;; Copy-Paste from: https://github.com/tonsky/FiraCode/wiki/Emacs-instructions#using-composition-char-table
+(let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+               (36 . ".\\(?:>\\)")
+               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+               (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+               (48 . ".\\(?:x[a-zA-Z]\\)")
+               (58 . ".\\(?:::\\|[:=]\\)")
+               (59 . ".\\(?:;;\\|;\\)")
+               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+               (91 . ".\\(?:]\\)")
+               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+               (94 . ".\\(?:=\\)")
+               (119 . ".\\(?:ww\\)")
+               (123 . ".\\(?:-\\)")
+               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
+               )
+             ))
+  (dolist (char-regexp alist)
+    (set-char-table-range composition-function-table (car char-regexp)
+                          `([,(cdr char-regexp) 0 font-shape-gstring]))))
+
 (setq-default line-spacing 2)
 
 (defun set-frame-background-color (frame)
@@ -122,7 +156,7 @@
   (window-number-mode t))
 
 ;; Completion
-;; =====
+;; ------------
 (use-package ido-vertical-mode)
 (ido-mode t)
 (ido-everywhere t)
@@ -156,7 +190,7 @@
 
 
 ;; File tree
-;; =====
+;; ------------
 (use-package neotree
   :bind (("s-B" . neotree-toggle))
   :config
@@ -180,7 +214,7 @@
 
 
 ;; Git
-;; =====
+;; ------------
 (use-package magit
   :bind (("C-c C-g" . magit-status)))
 (use-package git-gutter
@@ -189,7 +223,7 @@
 
 
 ;; Terminal
-;; =====
+;; ------------
 (use-package shell-pop
   :config
   (custom-set-variables
@@ -199,7 +233,7 @@
 
 
 ;; Text
-;; =====
+;; ------------
 (use-package expand-region
   :bind (("M-@" . er/expand-region)
          ("C-M-@" . er/contract-region)))
@@ -215,7 +249,7 @@
         ("M-*" . 'mc/mark-all-like-this)))
 
 ;; Org-mode
-;; =====
+;; ------------
 ;; Some basic Org defaults
 (use-package org
   :config
@@ -235,7 +269,7 @@
 
 
 ;; Program
-;; =====
+;; ------------
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
