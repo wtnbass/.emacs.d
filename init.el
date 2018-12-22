@@ -1,3 +1,4 @@
+;;; -*- coding: utf-8 ; lexical-binding: t -*-
 ;; Package
 ;; ------------
 (require 'package)
@@ -6,7 +7,8 @@
 (when (< emacs-major-version 27)
   (package-initialize))
 
-(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -16,8 +18,7 @@
 
 ;; Key Binding
 ;; ------------
-(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
-(define-key global-map (kbd "C-x ?") 'help-command)
+(load-file (expand-file-name "minit.el" user-emacs-directory))
 
 ;; macOS
 (setq mac-command-modifier 'super)
@@ -45,9 +46,7 @@
 (setq ring-bell-function 'ignore)
 
 ;; image of startup buffer
-(setq fancy-splash-image (expand-file-name "~/.emacs.d/yotsuboshi_logo.png"))
-(setq inhibit-startup-message t)
-;; Do M-x display-about-screen if open startup buffer
+(setq fancy-splash-image (expand-file-name "yotsuboshi_logo.png" user-emacs-directory))
 
 ;; exec path
 (use-package exec-path-from-shell
@@ -63,10 +62,6 @@
 (setq mouse-wheel-progressive-speed nil)
 (setq mouse-wheel-follow-mouse 't)
 (setq scroll-step 1)
-
-;; Don't make backup files
-(setq make-backup-files nil)
-(setq auto-save-default nil)
 
 (setq large-file-warning-threshold 10000000)
 (global-auto-revert-mode t)
@@ -192,7 +187,7 @@
 ;; File tree
 ;; ------------
 (use-package neotree
-  :bind (("s-B" . neotree-toggle))
+  :bind (("<f8>" . neotree-toggle))
   :config
   (setq neo-window-width 32
         neo-create-file-auto-open t
@@ -395,3 +390,24 @@
   :config
   (use-package intero)
   (add-hook 'haskell-mode 'intero-mode))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("a24c5b3c12d147da6cef80938dca1223b7c7f70f2f382b26308eba014dc4833a" default))
+ '(package-selected-packages
+   '(intero haskell-mode elm-mode python-mode rust-mode go-mode prettier-js emmet-mode vue-mode typescript-mode web-mode lsp-mode toml-mode yaml-mode json-mode markdown-mode multiple-cursors expand-region shell-pop git-gutter magit undo-tree neotree swiper company smex ido-vertical-mode window-number material-theme exec-path-from-shell use-package))
+ '(shell-pop-shell-type
+   '("ansi-term" "*ansi-term*"
+     (lambda nil
+       (ansi-term shell-pop-term-shell))))
+ '(shell-pop-term-shell "/bin/bash")
+ '(shell-pop-universal-key "C-`"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

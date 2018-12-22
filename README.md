@@ -22,9 +22,6 @@ npm i -g vscode-css-languageserver-bin
 # lsp-javascript-typescript
 npm i -g javascript-typescript-langserver
 
-# lsp-typescript
-npm i -g typescript-language-server
-
 # lsp-vue
 npm i -g vue-language-server
 
