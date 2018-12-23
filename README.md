@@ -1,6 +1,6 @@
 # .emacs.d
 
-![screenshot](startup-screenshot.png)
+![screenshot](images/startup-screenshot.png)
 
 ## Installation
 

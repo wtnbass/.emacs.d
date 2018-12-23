@@ -8,6 +8,5 @@
 !init.el
 !minit.el
 !custom.el
-
-!startup-screenshot.png
-!yotsuboshi_logo.png
+!images
+!images/*

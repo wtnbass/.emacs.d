@@ -15,14 +15,12 @@
   (package-install 'use-package))
 (eval-when-compile (require 'use-package))
 
-
 (setq use-package-always-ensure t)
+
+(load-file (expand-file-name "minit.el" user-emacs-directory))
 
 ;; Key Binding
 ;; ------------
-(load-file (expand-file-name "minit.el" user-emacs-directory))
-
-;; macOS
 (setq mac-command-modifier 'super)
 (setq mac-right-command-modifier ' super)
 (setq mac-option-modifier 'meta)
@@ -42,12 +40,13 @@
 
 ;; Basic setting
 ;; ------------
+(require 'cl)
 (prefer-coding-system 'utf-8)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 
 ;; image of startup buffer
-(setq fancy-splash-image (expand-file-name "yotsuboshi_logo.png" user-emacs-directory))
+(setq fancy-splash-image (expand-file-name "images/yotsuboshi_logo.png" user-emacs-directory))
 
 ;; exec path
 (use-package exec-path-from-shell
