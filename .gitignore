@@ -3,6 +3,7 @@
 !README.md
 !settings.sh
 
+!early-init.el
 !init.el
 !minit.el
 !custom.el

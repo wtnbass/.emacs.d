@@ -4,8 +4,8 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") )
-(when (< emacs-major-version 27)
-  (package-initialize))
+
+(package-initialize)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
@@ -13,6 +13,8 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+(eval-when-compile (require 'use-package))
+
 
 (setq use-package-always-ensure t)
 
@@ -40,7 +42,6 @@
 
 ;; Basic setting
 ;; ------------
-(require 'cl)
 (prefer-coding-system 'utf-8)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
@@ -145,10 +146,6 @@
   (set-frame-parameter (selected-frame) 'alpha 95)
   (set-frame-parameter nil 'fullscreen 'maximized))
 
-(use-package window-number
-  :bind(("C-x o" . 'window-number-switch))
-  :config
-  (window-number-mode t))
 
 ;; Completion
 ;; ------------
@@ -306,7 +303,7 @@
   (add-hook 'typescript-mode-hook 'lsp)
   (add-hook 'vue-mode-hook 'lsp)
   ;; Python
-  (add-hook 'python-mode-hook #'lsp-python-enable)
+  (add-hook 'python-mode-hook 'lsp)
   ;; Rust
   (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
   (add-hook 'rust-mode-hook 'lsp)
