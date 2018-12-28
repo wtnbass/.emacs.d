@@ -6,7 +6,6 @@
 
 !early-init.el
 !init.el
-!minit.el
 !custom.el
 !images
 !images/*

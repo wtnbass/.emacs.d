@@ -4,11 +4,9 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") )
-
 (package-initialize)
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file)
+(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -17,10 +15,11 @@
 
 (setq use-package-always-ensure t)
 
-(load-file (expand-file-name "minit.el" user-emacs-directory))
-
 ;; Key Binding
 ;; ------------
+(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+(define-key global-map (kbd "C-x ?") 'help-command)
+
 (setq mac-command-modifier 'super)
 (setq mac-right-command-modifier ' super)
 (setq mac-option-modifier 'meta)
@@ -40,18 +39,24 @@
 
 ;; Basic setting
 ;; ------------
-(require 'cl)
 (prefer-coding-system 'utf-8)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 
 ;; image of startup buffer
+(setq inhibit-startup-message t)
 (setq fancy-splash-image (expand-file-name "images/yotsuboshi_logo.png" user-emacs-directory))
+
+;; Don't make backup files
+(setq make-backup-files nil)
+(setq auto-save-default nil)
 
 ;; exec path
 (use-package exec-path-from-shell
-  :ensure t)
-(exec-path-from-shell-initialize)
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize)))
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
@@ -89,8 +94,10 @@
 (global-visual-line-mode t)
 
 ;; UI
-(use-package material-theme)
-(load-theme 'material)
+(use-package monokai-theme
+  :ensure t
+  :config
+  (load-theme 'monokai))
 
 (global-display-line-numbers-mode t)
 (column-number-mode t)
@@ -155,36 +162,36 @@
 (setq ido-enable-flex-matching t)
 (setq ido-auto-merge-work-directories-length -1)
 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
+
 (use-package smex
-  :bind (("M-x" . smex)
-         ("M-X" . smex-major-mode-commands)
-         ("C-c C-c M-x". execute-extended-command)))
+  :config
+  (global-set-key (kbd "M-x") 'smex)
+  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command))
 
 (use-package company
-  :bind (:map company-active-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous))
   :config
+  (global-company-mode t)
   (abbrev-mode t)
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (setq company-minimum-prefix-length 1)
   (setq company-idle-delay 0.2)
   (setq company-selection-wrap-around t)
   (setq company-dabbrev-downcase nil)
   (setq company-tooltip-align-annotations t))
-(global-company-mode t)
 
 (use-package swiper
   :config
-  (global-set-key "\C-s" 'swiper)
-  (global-set-key "\C-r" 'swiper)
+  (global-set-key (kbd "C-s") 'swiper)
+  (global-set-key (kbd "C-r") 'swiper)
   (global-set-key (kbd "s-f") 'swiper))
-
 
 ;; File tree
 ;; ------------
 (use-package neotree
-  :bind (("<f8>" . neotree-toggle))
   :config
+  (global-set-key (kbd "<f-8>") 'neotree-toggle)
   (setq neo-window-width 32
         neo-create-file-auto-open t
         neo-banner-message nil
@@ -207,7 +214,9 @@
 ;; Git
 ;; ------------
 (use-package magit
-  :bind (("C-c C-g" . magit-status)))
+  :config
+  (global-set-key (kbd "C-c C-g") 'magit-status))
+
 (use-package git-gutter
   :config
   (global-git-gutter-mode t))
@@ -225,19 +234,22 @@
 
 ;; Text
 ;; ------------
+
 (use-package expand-region
-  :bind (("M-@" . er/expand-region)
-         ("C-M-@" . er/contract-region)))
+  :config
+  (global-set-key (kbd "M-@") 'er/expand-region)
+  (global-set-key (kbd "C-M-@") 'er/contract-region))
 
 (use-package multiple-cursors
-  :bind(("M-S-<up>" . 'mc/mark-previous-like-this)
-        ("M-S-<down>" . 'mc/mark-next-like-this)
-        ("M-P" . 'mc/mark-previous-like-this)
-        ("M-N" . 'mc/mark-next-like-this)
-        ("M-L" . 'mc/mark-all-like-this)
-        ("C-M-P" . 'mc/skip-to-previous-like-this)
-        ("C-M-N" . 'mc/skip-to-next-like-this)
-        ("M-*" . 'mc/mark-all-like-this)))
+  :config
+  (global-set-key (kbd "M-S-<up>") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "M-S-<down>") 'mc/mark-next-like-this)
+  (global-set-key (kbd "M-P") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "M-N") 'mc/mark-next-like-this)
+  (global-set-key (kbd "M-L") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-M-P") 'mc/skip-to-previous-like-this)
+  (global-set-key (kbd "C-M-N") 'mc/skip-to-next-like-this)
+  (global-set-key (kbd "M-*") 'mc/mark-all-like-this))
 
 ;; Org-mode
 ;; ------------
@@ -314,7 +326,7 @@
 
 (use-package web-mode
   :mode "\\.html\\'"
-  :mode ".erb\\'"
+  :mode "\\.erb\\'"
   :mode "\\.[agj]sp\\'"
   :mode "\\.tera\\'"
   :config
@@ -324,13 +336,15 @@
   (setq web-mode-attr-indent-offset 2)
   (setq web-mode-attr-value-indent-offset 2))
 
-;; Typescript
+;; JavaScript
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-mode))
+(setq js-indent-level 2)
+
+;; TypeScript
 (use-package typescript-mode
-  :mode "\\.ts\\'"
-  :mode "\\.tsx\\'"
+  :mode "\\.ts[x]?\\'"
   :config
   (setq typescript-indent-level 2)
-  (setq emmet-self-closing-tag-style " /")
   (setq company-tooltip-align-annotations t)
   (add-hook 'typescript-mode 'flycheck-mode))
 
@@ -349,6 +363,9 @@
 ;; Prettier
 (use-package prettier-js
   :config
+  (add-hook 'html-mode-hook 'prettier-js-mode)
+  (add-hook 'css-mode-hook 'prettier-js-mode)
+  (add-hook 'js-mode-hook 'prettier-js-mode)
   (add-hook 'web-mode-hook 'prettier-js-mode)
   (add-hook 'typescript-mode-hook 'prettier-js-mode)
   (add-hook 'vue-mode-hook 'prettier-js-mode))

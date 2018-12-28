@@ -4,9 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("a24c5b3c12d147da6cef80938dca1223b7c7f70f2f382b26308eba014dc4833a" default))
- '(package-selected-packages
-   '(use-package-hydra intero haskell-mode elm-mode python-mode rust-mode go-mode prettier-js emmet-mode vue-mode typescript-mode web-mode lsp-mode toml-mode yaml-mode json-mode markdown-mode multiple-cursors expand-region shell-pop git-gutter magit undo-tree neotree swiper company smex ido-vertical-mode window-number material-theme exec-path-from-shell use-package))
+   '("bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" default))
  '(shell-pop-shell-type
    '("ansi-term" "*ansi-term*"
      (lambda nil
