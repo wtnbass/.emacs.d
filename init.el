@@ -188,6 +188,10 @@
   (global-set-key (kbd "C-r") 'swiper)
   (global-set-key (kbd "s-f") 'swiper))
 
+(use-package avy
+  :config
+  (global-set-key (kbd "M-SPC") 'avy-goto-char-timer))
+
 ;; File tree
 ;; ------------
 (use-package neotree
