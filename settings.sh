@@ -1,5 +1,6 @@
-EMACS_ROOT=~/src/git.savannah.gnu.org/git/emacs
+EMACS_ROOT=~/Projects/emacs
 
-export PATH=$EMACS_ROOT/src:$PATH
+export PATH=$EMACS_ROOT/src:$EMACS_ROOT/lib-src:$PATH
 
-alias e='emacs -nw'
+alias e='emacsclient -t -a ""'
+alias ekill='emacsclient -e "(kill-emacs)"'

@@ -5,7 +5,7 @@
 ## Installation
 
 ```sh
-git clone git@github.com:wtnbass/.emacs.d.git ~/.emacs.d
+git clone https://github.com/wtnbass/.emacs.d.git ~/.emacs.d
 ```
 
 ## Dependencies
