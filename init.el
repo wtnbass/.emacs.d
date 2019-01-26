@@ -215,7 +215,6 @@
   :config
   (global-undo-tree-mode t))
 
-
 ;; Git
 ;; ------------
 (use-package magit
@@ -286,6 +285,46 @@
 
 ;; And all of those files should be in included agenda.
 (setq org-agenda-files '("~/org"))
+
+;; publish
+(setq blog-header-file "~/Projects/blog/partials/header.html"
+      blog-footer-file "~/Projects/blog/partials/footer.html")
+
+(defun blog-header (arg)
+  (with-temp-buffer
+    (insert-file-contents blog-header-file)
+    (buffer-string)))
+
+(defun blog-footer (arg)
+  (with-temp-buffer
+    (insert-file-contents blog-footer-file)
+    (buffer-string)))
+
+(defun filter-local-links ()
+  (if (org-export-derived-backend-p backend 'html)
+      (replace-regexp-in-string "/index.html" "/" link)))
+
+(setq org-publish-project-alist
+      '(("blog-contents"
+         :base-directory "~/Projects/blog/org"
+         :base-extension "org"
+         :publishing-directory "~/Projects/blog/public"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4
+         :section-numbers nil
+         :html-head nil
+         :heml-head-include-scripts nil
+         :html-preamble blog-header
+         :html-postamble blog-footer)
+        ("blog-static"
+         :base-directory "~/Projects/blog/org"
+         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|eot\\|svg\\|woff\\|woff2\\|ttf"
+         :publishing-directory "~/Projects/blog/public"
+         :recursive t
+         :publishing-function org-publish-attachment)
+        ("blog" :components ("blog-contents" "blog-static"))))
+;;(add-to-list 'org-export-filter-link-functions 'filter-local-links)
 
 
 ;; Program
