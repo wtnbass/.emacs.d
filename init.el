@@ -196,7 +196,7 @@
 ;; ------------
 (use-package neotree
   :config
-  (global-set-key (kbd "<f-8>") 'neotree-toggle)
+  (global-set-key (kbd "<f8>") 'neotree-toggle)
   (setq neo-window-width 32
         neo-create-file-auto-open t
         neo-banner-message nil
@@ -310,36 +310,16 @@
 (use-package toml-mode)
 
 ;; Language Server Protocol
-(use-package lsp-mode
-  :init
-  ;; clangd
-  (when (equal system-type 'darwin)
-    (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
-  :config
-  ;; C/C++
-  (add-hook 'c-mode-hook 'lsp)
-  (add-hook 'c++-mode-hook 'lsp)
-  (add-hook 'objc-mode-hook 'lsp)
-  ;; html
-  (add-hook 'html-mode-hook 'lsp)
-  ;; CSS
-  (add-hook 'css-mode-hook 'lsp)
-  (add-hook 'sass-mode-hook 'lsp)
-  (add-hook 'scss-mode-hook 'lsp)
-  ;; Javascript/Typescript
-  (add-hook 'js-mode-hook 'lsp)
-  (add-hook 'typescript-mode-hook 'lsp)
-  (add-hook 'vue-mode-hook 'lsp)
-  ;; Python
-  (add-hook 'python-mode-hook 'lsp)
-  ;; Rust
-  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
-  (add-hook 'rust-mode-hook 'lsp)
-  ;; Go
-  (add-hook 'go-mode-hook 'lsp))
-
+(use-package lsp-mode)
 (use-package lsp-ui :commands lsp-ui-mode)
 (use-package company-lsp :commands company-lsp)
+
+;; C/C++
+;; (when (equal system-type 'darwin)
+;;   (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
+;; (add-hook 'c-mode-hook #'lsp)
+;; (add-hook 'c++-mode-hook #'lsp)
+;; (add-hook 'objc-mode-hook #'lsp)
 
 (use-package web-mode
   :mode "\\.html\\'"
@@ -347,15 +327,27 @@
   :mode "\\.[agj]sp\\'"
   :mode "\\.tera\\'"
   :config
+  (add-hook 'web-mode-hook #'lsp)
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-attr-indent-offset 2)
   (setq web-mode-attr-value-indent-offset 2))
 
+;; html
+(add-hook 'html-mode-hook #'lsp)
+
+;; CSS
+(add-hook 'css-mode-hook #'lsp)
+(use-package sass-mode
+  :config
+  (add-hook 'sass-mode-hook #'lsp)
+  (add-hook 'scss-mode-hook #'lsp))
+
 ;; JavaScript
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-mode))
 (setq js-indent-level 2)
+(add-hook 'js-mode-hook #'lsp)
 
 ;; TypeScript
 (use-package typescript-mode
@@ -363,10 +355,12 @@
   :config
   (setq typescript-indent-level 2)
   (setq company-tooltip-align-annotations t)
-  (add-hook 'typescript-mode 'flycheck-mode))
+  (add-hook 'typescript-mode-hook #'lsp))
 
 ;; Vue.js
-(use-package vue-mode)
+(use-package vue-mode
+  :config
+  (add-hook 'vue-mode-hook #'lsp))
 
 ;; Emmet
 (use-package emmet-mode
@@ -390,6 +384,7 @@
 ;; Go
 (use-package go-mode
   :config
+  (add-hook 'go-mode-hook #'lsp)
   (add-hook 'go-mode-hook
             '(lambda()
                (add-hook 'before-save-hook' 'gofmt-before-save))))
@@ -399,7 +394,8 @@
   :mode "\\.rs\\'"
   :config
   (setq rust-format-on-save t)
-  (add-hook 'rust-mode-hook 'flycheck-mode))
+  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
+  (add-hook 'rust-mode-hook #'lsp))
 
 ;; Python
 (use-package python-mode
@@ -407,7 +403,7 @@
   :config
   (setq py-python-command "python3")
   (setq python-indent 4)
-  (add-hook 'python-mode-hook 'flycheck-mode))
+  (add-hook 'python-mode-hook #'lsp))
 
 ;; Elm
 (use-package elm-mode
