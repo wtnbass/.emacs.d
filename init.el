@@ -150,8 +150,24 @@
 
 ;; window
 (unless (eq window-system nil)
-  (set-frame-parameter (selected-frame) 'alpha 95)
-  (set-frame-parameter nil 'fullscreen 'maximized))
+  (set-frame-parameter nil 'fullscreen 'maximized)
+  (setq alpha 95)
+  (defun plus-frame-alpha ()
+    (interactive)
+    (setq alpha (+ alpha 5))
+    (set-frame-parameter (selected-frame) 'alpha alpha))
+  (defun minus-frame-alpha ()
+    (interactive)
+    (setq alpha (- alpha 5))
+    (set-frame-parameter (selected-frame) 'alpha alpha))
+  (set-frame-parameter (selected-frame) 'alpha alpha)
+  (defhydra frame-alpha-hydra (:hint nil)
+    "
+[_p_] plus 5    [_n_] minus 5
+"
+    ("p" plus-frame-alpha)
+    ("n" minus-frame-alpha))
+    (global-set-key (kbd "C-c q") 'frame-alpha-hydra/body))
 
 
 ;; Completion
