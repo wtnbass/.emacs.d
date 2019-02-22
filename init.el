@@ -61,7 +61,6 @@
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(set-scroll-bar-mode nil)
 
 ;; set mouse scroll step
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
@@ -334,16 +333,19 @@
 (use-package toml-mode)
 
 ;; Language Server Protocol
-(use-package lsp-mode)
+(use-package lsp-mode
+  :config
+  (setq lsp-auto-guess-root t))
+
 (use-package lsp-ui :commands lsp-ui-mode)
 (use-package company-lsp :commands company-lsp)
 
 ;; C/C++
-;; (when (equal system-type 'darwin)
-;;   (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
-;; (add-hook 'c-mode-hook #'lsp)
-;; (add-hook 'c++-mode-hook #'lsp)
-;; (add-hook 'objc-mode-hook #'lsp)
+(when (equal system-type 'darwin)
+  (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
+(add-hook 'c-mode-hook #'lsp)
+(add-hook 'c++-mode-hook #'lsp)
+(add-hook 'objc-mode-hook #'lsp)
 
 (use-package web-mode
   :mode "\\.html\\'"
