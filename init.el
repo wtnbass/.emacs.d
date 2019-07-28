@@ -178,22 +178,73 @@
 
 ;; File tree
 ;; ------------
-(use-package neotree
+(use-package treemacs
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
-  (global-set-key (kbd "<f8>") 'neotree-toggle)
-  (setq neo-window-width 32
-        neo-create-file-auto-open t
-        neo-banner-message nil
-        neo-show-updir-line t
-        neo-window-fixed-size nil
-        neo-vc-integration nil
-        neo-mode-line-type 'neotree
-        neo-smart-open t
-        neo-show-hidden-files t
-        neo-mode-line-type 'none
-        neo-auto-indent-point t)
-  (setq neo-theme (if (display-graphic-p) 'nerd 'arrow))
-  (setq neo-hidden-regexp-list '("venv" "\\.pyc$" "~$" "\\.git" "__pycache__" ".DS_Store")))
+  (progn
+    (setq treemacs-collapse-dirs                 (if (treemacs--find-python3) 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-width                         35)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null (treemacs--find-python3))))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
 
 (use-package undo-tree
   :config
@@ -230,7 +281,7 @@
 
 (use-package multiple-cursors
   :config
-  (global-set-key (kbd "C-q") 'multiple-cursors-hydra/body)
+  (global-set-key (kbd "C-c m") 'multiple-cursors-hydra/body)
   (defhydra multiple-cursors-hydra (:hint nil)
     "
      ^Up^            ^Down^        ^Other^
@@ -270,49 +321,13 @@
 ;; And all of those files should be in included agenda.
 (setq org-agenda-files '("~/org"))
 
-;; publish
-(setq blog-header-file "~/Projects/blog/partials/header.html"
-      blog-footer-file "~/Projects/blog/partials/footer.html")
-
-(defun blog-header (arg)
-  (with-temp-buffer
-    (insert-file-contents blog-header-file)
-    (buffer-string)))
-
-(defun blog-footer (arg)
-  (with-temp-buffer
-    (insert-file-contents blog-footer-file)
-    (buffer-string)))
-
-(defun filter-local-links ()
-  (if (org-export-derived-backend-p backend 'html)
-      (replace-regexp-in-string "/index.html" "/" link)))
-
-(setq org-publish-project-alist
-      '(("blog-contents"
-         :base-directory "~/Projects/blog/org"
-         :base-extension "org"
-         :publishing-directory "~/Projects/blog/public"
-         :recursive t
-         :publishing-function org-html-publish-to-html
-         :headline-levels 4
-         :section-numbers nil
-         :html-head nil
-         :heml-head-include-scripts nil
-         :html-preamble blog-header
-         :html-postamble blog-footer)
-        ("blog-static"
-         :base-directory "~/Projects/blog/org"
-         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|eot\\|svg\\|woff\\|woff2\\|ttf"
-         :publishing-directory "~/Projects/blog/public"
-         :recursive t
-         :publishing-function org-publish-attachment)
-        ("blog" :components ("blog-contents" "blog-static"))))
-;;(add-to-list 'org-export-filter-link-functions 'filter-local-links)
-
 
 ;; Program
 ;; ------------
+(use-package yasnippet)
+(use-package yasnippet-snippets)
+(setq yas-snippet-dirs '((yasnippet-snippets-dir)))
+
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -334,18 +349,51 @@
 
 ;; Language Server Protocol
 (use-package lsp-mode
+  :hook ((web-mode . lsp)
+         (html-mode . lsp)
+         (css-mode . lsp)
+         (sass-mode . lsp)
+         (scss-mode . lsp)
+         (js-mode . lsp)
+         (typescript-mode . lsp)
+         (vue-mode . lsp)
+         (c-mode . lsp)
+         (c++-mode . lsp)
+         (objc-mode . lsp)
+         (go-mode . lsp)
+         (rust-mode . lsp)
+         (python-mode . lsp))
+  :commands lsp
   :config
-  (setq lsp-auto-guess-root t))
+  (setq lsp-auto-guess-root t)
+  (when (equal system-type 'darwin)
+    (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd")))
 
 (use-package lsp-ui :commands lsp-ui-mode)
 (use-package company-lsp :commands company-lsp)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-;; C/C++
-(when (equal system-type 'darwin)
-  (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd"))
-(add-hook 'c-mode-hook #'lsp)
-(add-hook 'c++-mode-hook #'lsp)
-(add-hook 'objc-mode-hook #'lsp)
+;; Emmet
+(use-package emmet-mode
+  :hook ((html-mode . emmet-mode)
+         (css-mode . emmet-mode)
+         (js-mode . emmet-mode)
+         (web-mode . emmet-mode)
+         (typescript-mode . emmet-mode)
+         (vue-mode . emmet-mode))
+  :config
+  (setq emmet-self-closing-tag-style " /")
+  (setq emmet-expand-jsx-className? t))
+
+;; Prettier
+(use-package prettier-js
+  :hook (
+  (html-mode . prettier-js-mode)
+  (css-mode . prettier-js-mode)
+  (js-mode . prettier-js-mode)
+  (web-mode . prettier-js-mode)
+  (typescript-mode . prettier-js-mode)
+  (vue-mode . prettier-js-mode)))
 
 (use-package web-mode
   :mode "\\.html\\'"
@@ -353,64 +401,32 @@
   :mode "\\.[agj]sp\\'"
   :mode "\\.tera\\'"
   :config
-  (add-hook 'web-mode-hook #'lsp)
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-attr-indent-offset 2)
   (setq web-mode-attr-value-indent-offset 2))
 
-;; html
-(add-hook 'html-mode-hook #'lsp)
-
-;; CSS
-(add-hook 'css-mode-hook #'lsp)
-(use-package sass-mode
-  :config
-  (add-hook 'sass-mode-hook #'lsp)
-  (add-hook 'scss-mode-hook #'lsp))
+;; css
+(use-package sass-mode)
 
 ;; JavaScript
-(add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-mode))
 (setq js-indent-level 2)
-(add-hook 'js-mode-hook #'lsp)
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-mode))
 
 ;; TypeScript
 (use-package typescript-mode
   :mode "\\.ts[x]?\\'"
   :config
   (setq typescript-indent-level 2)
-  (setq company-tooltip-align-annotations t)
-  (add-hook 'typescript-mode-hook #'lsp))
+  (setq company-tooltip-align-annotations t))
 
 ;; Vue.js
-(use-package vue-mode
-  :config
-  (add-hook 'vue-mode-hook #'lsp))
-
-;; Emmet
-(use-package emmet-mode
-  :config
-  (setq emmet-self-closing-tag-style " /")
-  (setq emmet-expand-jsx-className? t)
-  (add-hook 'web-mode-hook 'emmet-mode)
-  (add-hook 'typescript-mode-hook 'emmet-mode)
-  (add-hook 'vue-mode-hook 'emmet-mode))
-
-;; Prettier
-(use-package prettier-js
-  :config
-  (add-hook 'html-mode-hook 'prettier-js-mode)
-  (add-hook 'css-mode-hook 'prettier-js-mode)
-  (add-hook 'js-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-  (add-hook 'typescript-mode-hook 'prettier-js-mode)
-  (add-hook 'vue-mode-hook 'prettier-js-mode))
+(use-package vue-mode)
 
 ;; Go
 (use-package go-mode
   :config
-  (add-hook 'go-mode-hook #'lsp)
   (add-hook 'go-mode-hook
             '(lambda()
                (add-hook 'before-save-hook' 'gofmt-before-save))))
@@ -420,16 +436,14 @@
   :mode "\\.rs\\'"
   :config
   (setq rust-format-on-save t)
-  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
-  (add-hook 'rust-mode-hook #'lsp))
+  (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls")))
 
 ;; Python
 (use-package python-mode
   :mode "\\.py\\'"
   :config
   (setq py-python-command "python3")
-  (setq python-indent 4)
-  (add-hook 'python-mode-hook #'lsp))
+  (setq python-indent 4))
 
 ;; Elm
 (use-package elm-mode
