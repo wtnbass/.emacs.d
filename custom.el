@@ -8,7 +8,7 @@
     ("bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" default)))
  '(package-selected-packages
    (quote
-    (ace-window treemacs-magit treemacs-icons-dired treemacs lsp-treemacs yasnippet-snippets yasnippet yaml-mode web-mode vue-mode use-package undo-tree typescript-mode toml-mode swiper smex shell-pop sass-mode rust-mode python-mode prettier-js neotree multiple-cursors monokai-theme magit lsp-ui json-mode intero ido-vertical-mode hydra go-mode git-gutter expand-region exec-path-from-shell emmet-mode elm-mode company-lsp avy)))
+    (poet-theme ace-window treemacs-magit treemacs-icons-dired treemacs lsp-treemacs yasnippet-snippets yasnippet yaml-mode web-mode vue-mode use-package undo-tree typescript-mode toml-mode swiper smex shell-pop sass-mode rust-mode python-mode prettier-js neotree multiple-cursors monokai-theme magit lsp-ui json-mode intero ido-vertical-mode hydra go-mode git-gutter expand-region exec-path-from-shell emmet-mode elm-mode company-lsp avy)))
  '(shell-pop-shell-type
    (quote
     ("ansi-term" "*ansi-term*"

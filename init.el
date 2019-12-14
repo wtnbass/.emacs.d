@@ -101,6 +101,7 @@
 
 (global-display-line-numbers-mode t)
 (column-number-mode t)
+(hl-line-mode t)
 
 ;; Font
 ;;(set-frame-font (font-spec :family "Monaco" :size 12))
@@ -120,6 +121,13 @@
 (unless (eq window-system nil)
   (set-frame-parameter nil 'fullscreen 'maximized)
   (setq alpha 95)
+  (defhydra frame-alpha-hydra (:hint nil)
+    "
+[_p_] plus 5    [_n_] minus 5
+"
+    ("p" plus-frame-alpha)
+    ("n" minus-frame-alpha))
+  (global-set-key (kbd "C-c q") 'frame-alpha-hydra/body)
   (defun plus-frame-alpha ()
     (interactive)
     (setq alpha (+ alpha 5))
@@ -128,14 +136,7 @@
     (interactive)
     (setq alpha (- alpha 5))
     (set-frame-parameter (selected-frame) 'alpha alpha))
-  (set-frame-parameter (selected-frame) 'alpha alpha)
-  (defhydra frame-alpha-hydra (:hint nil)
-    "
-[_p_] plus 5    [_n_] minus 5
-"
-    ("p" plus-frame-alpha)
-    ("n" minus-frame-alpha))
-    (global-set-key (kbd "C-c q") 'frame-alpha-hydra/body))
+  (set-frame-parameter (selected-frame) 'alpha alpha))
 
 
 ;; Completion
@@ -302,7 +303,7 @@
     ("r" mc/mark-all-in-region-regexp :exit t)
     ("q" nil)))
 
-;; Org-mode
+;; Text Modes
 ;; ------------
 ;; Some basic Org defaults
 (use-package org
@@ -322,17 +323,18 @@
 (setq org-agenda-files '("~/org"))
 
 
-;; Program
-;; ------------
-(use-package yasnippet)
-(use-package yasnippet-snippets)
-(setq yas-snippet-dirs '((yasnippet-snippets-dir)))
-
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
+
+
+;; Program
+;; ------------
+(use-package yasnippet)
+(use-package yasnippet-snippets)
+(setq yas-snippet-dirs '((yasnippet-snippets-dir)))
 
 (use-package json-mode
   :mode "\\.json\\'"
@@ -387,13 +389,13 @@
 
 ;; Prettier
 (use-package prettier-js
-  :hook (
-  (html-mode . prettier-js-mode)
-  (css-mode . prettier-js-mode)
-  (js-mode . prettier-js-mode)
-  (web-mode . prettier-js-mode)
-  (typescript-mode . prettier-js-mode)
-  (vue-mode . prettier-js-mode)))
+  :hook ((html-mode . prettier-js-mode)
+         (css-mode . prettier-js-mode)
+         (js-mode . prettier-js-mode)
+         (web-mode . prettier-js-mode)
+         (typescript-mode . prettier-js-mode)
+         (vue-mode . prettier-js-mode)
+         (markdown-mode . prettier-js-mode)))
 
 (use-package web-mode
   :mode "\\.html\\'"
